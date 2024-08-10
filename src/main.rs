@@ -4,7 +4,9 @@ async fn main() {
 
     let user_routes = learning_axum::users::interactive::create_route();
 
-    app = app.merge(user_routes);
+    let json_map_routes = learning_axum::users::map_json::create_routes();
+
+    app = app.merge(user_routes).merge(json_map_routes);
 
     // listener
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
