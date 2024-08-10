@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 axum = "0.7.5"
 tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }
+http-body-util = "0.1.2"
