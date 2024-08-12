@@ -1,5 +1,6 @@
 use axum::{
     extract::{Path, Query},
+    http::HeaderMap,
     response::IntoResponse,
     routing::get,
     Router,
@@ -8,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 pub fn create_routes() -> Router {
     Router::new()
+        .route("/list-header", get(list_header))
         .route("/users/:user_id", get(get_user_from_id))
         .route(
             "/category/:cat_id/product/:pro_id",
@@ -36,4 +38,21 @@ async fn list_products(Query(pagination): Query<Pagination>) -> String {
     let page = pagination.page.unwrap_or(1);
     let amount = pagination.amount_per_page.unwrap_or(10);
     format!("You are list {amount} products at page: {page}")
+}
+
+async fn list_header(hm: HeaderMap) -> String {
+    if let Some(value) = hm.get("x-custom-header") {
+        println!("Custom header: {}", value.to_str().unwrap());
+    }
+
+    let mut response = String::from(""); // initial empty `String`
+
+    hm.iter()
+        .map(|(name, value)| {
+            response.push_str(&format!("Name: {:#?} Value: {:#?}\n", name, value));
+            response.clone()
+        })
+        .collect()
+
+    // "Hi".to_string()
 }
