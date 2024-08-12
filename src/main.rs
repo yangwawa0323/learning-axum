@@ -8,8 +8,11 @@ async fn main() {
 
     let path_demo_routes = learning_axum::users::path_extractor::create_routes();
 
+    let shared_data_routes = learning_axum::users::extension::create_routes();
+
     app = app
         .merge(user_routes)
+        .merge(shared_data_routes)
         .merge(json_map_routes)
         .merge(path_demo_routes);
 
