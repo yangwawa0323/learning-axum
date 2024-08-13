@@ -1,4 +1,10 @@
-use axum::{extract::Request, http::HeaderValue, response::Response};
+use std::net::SocketAddr;
+
+use axum::{
+    extract::{ConnectInfo, Request},
+    http::HeaderValue,
+    response::Response,
+};
 use futures_util::future::BoxFuture;
 use tower::{Layer, Service};
 use tracing::info;
@@ -43,7 +49,11 @@ where
         let uri = req.uri().path().to_string();
         let method = req.method().to_string();
 
-        info!(" {} : {}\n", method, uri);
+        if let Some(ConnectInfo(conn)) = req.extensions().get::<ConnectInfo<SocketAddr>>() {
+            info!("{} - {} : {}\n", conn, method, uri);
+        } else {
+            info!(" {} : {}\n", method, uri);
+        }
 
         Box::pin(async move {
             let mut response = inner.call(req).await?;

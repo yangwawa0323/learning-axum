@@ -1,10 +1,18 @@
+use std::net::SocketAddr;
+
 use learning_axum::users::middleware::MyLayer;
+use time::macros::format_description;
+use tracing_subscriber::fmt::time::LocalTime;
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
         .pretty()
         .compact()
+        .with_target(false)
+        .with_timer(LocalTime::new(format_description!(
+            "[year]-[month]-[day] [hour]:[minute]:[second]"
+        )))
         .with_max_level(tracing::Level::DEBUG)
         .init();
 
@@ -28,5 +36,10 @@ async fn main() {
     // listener
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await
+    .unwrap();
 }
