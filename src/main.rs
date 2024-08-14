@@ -28,10 +28,13 @@ async fn main() {
 
     let status_code_routes = learning_axum::users::status_code::create_routes();
 
+    let validate_json_routes = learning_axum::users::validate_json::create_routes();
+
     app = app
         .merge(user_routes)
         .merge(shared_data_routes)
         .merge(json_map_routes)
+        .merge(validate_json_routes)
         .merge(status_code_routes)
         .merge(path_demo_routes)
         .layer(MyLayer);
