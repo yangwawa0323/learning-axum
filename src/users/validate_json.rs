@@ -1,25 +1,31 @@
 use axum::{
     async_trait,
-    extract::{FromRequest, Request},
+    extract::{rejection::JsonRejection, FromRequest, Request},
     http::StatusCode,
     routing::post,
-    Router,
+    Json, RequestExt, Router,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use validator::Validate;
 
 pub fn create_routes() -> Router {
     Router::new().route("/validate-json", post(custom_json_extractor))
 }
 
-async fn custom_json_extractor(js_data: RequestUser) {
+async fn custom_json_extractor(js_data: RequestUser) -> Json<RequestUser> {
     tracing::debug!("{js_data:#?}");
+    Json(js_data)
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct RequestUser {
+    #[validate(email(message = "please input user email"))]
     pub name: String,
+    #[validate(length(min = 8, message = "password at least 8 characters"))]
     pub password: String,
+    #[validate(range(min = 18, max = 60, message = "age is out of range"))]
+    pub age: u32,
 }
 
 #[async_trait]
@@ -30,20 +36,26 @@ where
     type Rejection = (StatusCode, String);
 
     // required method
-    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
-        if rand::random::<bool>() {
-            Ok(RequestUser {
-                name: "abc".to_string(),
-                password: String::from("secret"),
-            })
-        } else {
-            Err((
+    async fn from_request(req: Request, _state: &S) -> Result<Self, Self::Rejection> {
+        let Json(user): Json<RequestUser> = req.extract().await.map_err(|err: JsonRejection| {
+            (
                 StatusCode::BAD_REQUEST,
                 json!({
-                    "message" : "request is not correct!"
+                    "message": format!("{}", err)
                 })
                 .to_string(),
-            ))
+            )
+        })?;
+
+        if let Err(err) = user.validate() {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                json!({
+                    "message": format!("{}", err)
+                })
+                .to_string(),
+            ));
         }
+        Ok(user)
     }
 }
