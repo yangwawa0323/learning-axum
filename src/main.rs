@@ -18,7 +18,7 @@ async fn main() {
         .init();
 
     let mut app = axum::Router::new().fallback_service(
-        ServeDir::new("static_folder").not_found_service(ServeFile::new("static/404.html")),
+        ServeDir::new("static_folder").not_found_service(ServeFile::new("static_folder/404.html")),
     );
 
     let user_routes = learning_axum::users::interactive::create_route();
