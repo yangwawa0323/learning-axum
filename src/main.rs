@@ -2,6 +2,7 @@ use std::net::SocketAddr;
 
 use learning_axum::users::middleware::MyLayer;
 use time::macros::format_description;
+use tower_http::services::{ServeDir, ServeFile};
 use tracing_subscriber::fmt::time::LocalTime;
 
 #[tokio::main]
@@ -16,7 +17,9 @@ async fn main() {
         .with_max_level(tracing::Level::DEBUG)
         .init();
 
-    let mut app = axum::Router::new();
+    let mut app = axum::Router::new().fallback_service(
+        ServeDir::new("static_folder").not_found_service(ServeFile::new("static/404.html")),
+    );
 
     let user_routes = learning_axum::users::interactive::create_route();
 
