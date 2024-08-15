@@ -1,11 +1,14 @@
 use axum::{
+    debug_handler,
     extract::{Path, Query},
     http::HeaderMap,
     response::IntoResponse,
-    routing::get,
-    Router,
+    routing::{get, post},
+    Json, Router,
 };
 use serde::{Deserialize, Serialize};
+
+use super::validate_json::RequestUser;
 
 pub fn create_routes() -> Router {
     Router::new()
@@ -16,6 +19,7 @@ pub fn create_routes() -> Router {
             get(get_product_from_category),
         )
         .route("/list-products", get(list_products))
+        .route("/list-users/:user_id", post(list_users))
 }
 
 async fn get_user_from_id(Path(user_id): Path<i32>) -> impl IntoResponse {
@@ -55,4 +59,19 @@ async fn list_header(hm: HeaderMap) -> String {
         .collect()
 
     // "Hi".to_string()
+}
+
+#[debug_handler]
+async fn list_users(
+    Path(user_id): Path<i32>,             // T1
+    Query(pagination): Query<Pagination>, // T2
+    Json(user): Json<RequestUser>,        // T3
+) -> String {
+    format!(
+        "user id: {user_id} , amount per page : {}, at page : {} , username is : {}, age is : {}",
+        pagination.amount_per_page.unwrap_or(10),
+        pagination.page.unwrap_or(1),
+        user.name,
+        user.age,
+    )
 }
