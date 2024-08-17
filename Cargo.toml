@@ -18,3 +18,6 @@ rand = "0.8.5"
 validator = { version = "0.18.1", features = ["derive"] }
 
 tower-http = { version = "0.5.2" , features = ["fs"]}
+
+askama = { version = "0.12.1", features = ["with-axum"] }
+askama_axum = { version = "0.4.0", features = ["markdown"] }
