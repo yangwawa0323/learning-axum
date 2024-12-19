@@ -35,11 +35,17 @@ async fn main() {
 
     let template_routes = learning_axum::users::templates::create_routes();
 
+    let jwt_routes = learning_axum::users::jwt::create_routes();
+
+    let tree_routes = learning_axum::users::tree::create_routes();
+
     app = app
         .merge(user_routes)
         .merge(shared_data_routes)
         .merge(json_map_routes)
         .merge(template_routes)
+        .merge(tree_routes)
+        .merge(jwt_routes)
         .merge(validate_json_routes)
         .merge(status_code_routes)
         .merge(path_demo_routes)

@@ -7,13 +7,12 @@ edition = "2021"
 axum = { version = "0.7.5", features = ["macros"] }
 tokio = { version = "1.39.2", features = ["macros", "rt-multi-thread"] }
 http-body-util = "0.1.2"
-serde = { version ="1.0.205", features = ["derive"] }
+serde = { version = "1.0.208", features = ["alloc", "derive"] }
 serde_json = "1.0.122"
 tower = "0.4.13"
 futures-util = "0.3.30"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features= ["time", "local-time"] }
-time = { version = "0.3.36", features = ["macros"] }
 rand = "0.8.5"
 validator = { version = "0.18.1", features = ["derive"] }
 
@@ -21,3 +20,7 @@ tower-http = { version = "0.5.2" , features = ["fs"]}
 
 askama = { version = "0.12.1", features = ["with-axum"] }
 askama_axum = { version = "0.4.0", features = ["markdown"] }
+chrono = { version = "0.4.38", features = ["serde"] }
+jsonwebtoken = "9.3.0"
+time = { version = "0.3.36", features = ["macros"] }
+atree = "0.5.2"

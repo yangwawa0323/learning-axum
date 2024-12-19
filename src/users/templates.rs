@@ -1,5 +1,3 @@
-use std::path::Display;
-
 use askama_axum::Template;
 use axum::{
     response::{Html, IntoResponse},
